@@ -32,7 +32,6 @@
 @required
 // delegate is responsible for reporting the size of each element
 - (NSInteger)horizontalPickerView:(V8HorizontalPickerView *)picker widthForElementAtIndex:(NSInteger)index;
-
 @end
 
 // ------------------------------------------------------------------

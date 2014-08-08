@@ -16,8 +16,6 @@
 // collection of widths of each element.
 @property (nonatomic, strong) NSMutableArray *elementWidths;
 
-@property (nonatomic, assign) NSInteger elementPadding;
-
 // state keepers
 @property (nonatomic, assign) BOOL dataHasBeenLoaded;
 @property (nonatomic, assign) BOOL scrollSizeHasBeenSet;
@@ -78,7 +76,7 @@
 	self.firstVisibleElement = -1;
 	self.lastVisibleElement  = -1;
 
-	self.scrollEdgeViewPadding = 0.0f;
+	self.scrollEdgeViewPadding = 0;
 
 	self.autoresizesSubviews = YES;
 }
@@ -127,7 +125,7 @@
 					isSelected = (currentIndex == self.currentSelectedIndex);
 				}
 				// casting to V8HorizontalPickerLabel so we can call this without all the NSInvocation jazz
-				[(V8HorizontalPickerLabel *)view setSelectedElement:isSelected];
+				[(V8HorizontalPickerViewItem *)view setSelectedElement:isSelected];
 			}
 		}
 	}
@@ -448,23 +446,34 @@
 }
 
 // create a UILabel for this element.
-- (V8HorizontalPickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title {
+- (V8HorizontalPickerViewItem *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title {
 	CGRect labelFrame     = [self frameForElementAtIndex:index];
-	V8HorizontalPickerLabel *elementLabel = [[V8HorizontalPickerLabel alloc] initWithFrame:labelFrame];
+	V8HorizontalPickerViewItem *element = [[V8HorizontalPickerViewItem alloc] initWithFrame:labelFrame];
+    element.label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, labelFrame.size.width, labelFrame.size.height)];
+    
+    element.view = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(labelFrame) / 2) - self.borderRadius,
+                                                            (CGRectGetHeight(labelFrame) / 2) - self.borderRadius,
+                                                            2 * self.borderRadius,
+                                                            2 * self.borderRadius)];    
+    [element addSubview:element.view];
+    [element addSubview:element.label];
+    
+	element.label.textAlignment   = NSTextAlignmentCenter;
+	element.backgroundColor = self.backgroundColor;
+	element.label.text            = title;
+	element.label.font            = self.elementFont;
+    element.viewUnderLabel        = self.viewUnderLabel;
+    element.selectedViewUnderLabel = self.selectedViewUnderLabel;
+    element.borderRadius = self.borderRadius;
 
-	elementLabel.textAlignment   = NSTextAlignmentCenter;
-	elementLabel.backgroundColor = self.backgroundColor;
-	elementLabel.text            = title;
-	elementLabel.font            = self.elementFont;
-
-	elementLabel.normalStateColor   = self.textColor;
-	elementLabel.selectedStateColor = self.selectedTextColor;
+	element.normalStateColor   = self.textColor;
+	element.selectedStateColor = self.selectedTextColor;
 
 	// show selected status if this element is the selected one and is currently over selectionPoint
 	NSInteger currentIndex = [self nearestElementToCenter];
-	elementLabel.selectedElement = (self.currentSelectedIndex == index) && (currentIndex == self.currentSelectedIndex);
+	element.selectedElement = (self.currentSelectedIndex == index) && (currentIndex == self.currentSelectedIndex);
 
-	return elementLabel;
+	return element;
 }
 
 
@@ -700,6 +709,7 @@
 	if (recognizer.state == UIGestureRecognizerStateRecognized) {
 		CGPoint tapLocation    = [recognizer locationInView:_scrollView];
 		NSInteger elementIndex = [self elementContainingPoint:tapLocation];
+
 		if (elementIndex != -1) { // point not in element
 			[self scrollToElement:elementIndex animated:YES];
 		}
@@ -711,15 +721,16 @@
 
 // ------------------------------------------------------------------------
 #pragma mark - Picker Label Implementation
-@implementation V8HorizontalPickerLabel : UILabel
+@implementation V8HorizontalPickerViewItem : UIView
 
 - (void)setSelectedElement:(BOOL)selected {
 	if (self.selectedElement != selected) {
 		if (selected) {
-			self.textColor = self.selectedStateColor;
+			self.label.textColor = self.selectedStateColor;
 		} else {
-			self.textColor = self.normalStateColor;
+			self.label.textColor = self.normalStateColor;
 		}
+        [self setupView:selected];
 		_selectedElement = selected;
 		[self setNeedsLayout];
 	}
@@ -728,9 +739,24 @@
 - (void)setNormalStateColor:(UIColor *)color {
 	if (self.normalStateColor != color) {
 		_normalStateColor = color;
-		self.textColor = self.normalStateColor;
+		self.label.textColor = self.normalStateColor;
+        [self setupView:NO];
 		[self setNeedsLayout];
 	}
+}
+
+- (void)setupView:(BOOL)selected {
+    if (selected) {
+        self.view.backgroundColor = self.selectedViewUnderLabel.backgroundColor;
+        self.view.layer.borderColor = self.selectedViewUnderLabel.layer.borderColor;
+        self.view.layer.borderWidth = self.selectedViewUnderLabel.layer.borderWidth;
+    } else {
+        self.view.backgroundColor = self.viewUnderLabel.backgroundColor;
+        self.view.layer.borderColor = self.viewUnderLabel.layer.borderColor;
+        self.view.layer.borderWidth = self.viewUnderLabel.layer.borderWidth;
+    }
+    self.view.layer.cornerRadius = self.borderRadius;
+    self.view.clipsToBounds = YES;
 }
 
 @end

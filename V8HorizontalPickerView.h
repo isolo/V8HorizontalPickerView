@@ -28,9 +28,16 @@ typedef enum {
 // what font to use for the element labels?
 @property (nonatomic, strong) UIFont *elementFont;
 
+@property (nonatomic, assign) NSInteger elementPadding;
+
 // color of labels used in picker
 @property (nonatomic, strong) UIColor *textColor;
 @property (nonatomic, strong) UIColor *selectedTextColor; // color of current selected element
+
+@property (nonatomic, strong) UIView *viewUnderLabel;
+@property (nonatomic, strong) UIView *selectedViewUnderLabel;
+
+@property (nonatomic, assign) NSInteger borderRadius;
 
 // the point, defaults to center of view, where the selected element sits
 @property (nonatomic, assign) CGPoint selectionPoint;
@@ -57,10 +64,18 @@ typedef enum {
 
 
 // sub-class of UILabel that knows how to change it's state
-@interface V8HorizontalPickerLabel : UILabel <V8HorizontalPickerElementState> { }
+@interface V8HorizontalPickerViewItem : UIView <V8HorizontalPickerElementState> { }
 
 @property (nonatomic, assign) BOOL selectedElement;
 @property (nonatomic, strong) UIColor *selectedStateColor;
 @property (nonatomic, strong) UIColor *normalStateColor;
+
+@property (nonatomic, strong) UIView *viewUnderLabel;
+@property (nonatomic, strong) UIView *selectedViewUnderLabel;
+
+@property (nonatomic, assign) NSInteger borderRadius;
+
+@property (nonatomic, strong) UILabel *label;
+@property (nonatomic, strong) UIView *view;
 
 @end
