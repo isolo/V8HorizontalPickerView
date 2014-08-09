@@ -340,6 +340,16 @@
 
 
 #pragma mark - Scroll To Element Method
+- (void)scrollToElementWithoutSelection:(NSInteger)index animated:(BOOL)animate {
+    _currentSelectedIndex = index;
+    int x = [self centerOfElementAtIndex:index] - self.selectionPoint.x;
+	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
+    
+#if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
+	[self setNeedsLayout];
+#endif
+}
+
 - (void)scrollToElement:(NSInteger)index animated:(BOOL)animate {
 	_currentSelectedIndex = index;
 	int x = [self centerOfElementAtIndex:index] - self.selectionPoint.x;

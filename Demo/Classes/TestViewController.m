@@ -67,6 +67,8 @@ int indexCount;
     self.pickerView.borderRadius = 20;
     self.pickerView.elementPadding = 0;
     
+    [self.pickerView scrollToElement:3 animated:TRUE];
+    
 	[self.view addSubview:self.pickerView];
 }
 

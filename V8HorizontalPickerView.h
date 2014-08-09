@@ -56,7 +56,7 @@ typedef enum {
 // padding for left/right scroll edge views
 @property (nonatomic, assign) CGFloat scrollEdgeViewPadding;
 
-
+- (void)scrollToElementWithoutSelection:(NSInteger)index animated:(BOOL)animate;
 - (void)reloadData;
 - (void)scrollToElement:(NSInteger)index animated:(BOOL)animate;
 
