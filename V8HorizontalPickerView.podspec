@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "V8HorizontalPickerView"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "A horizontal UIPickerView control for iOS."
 
   s.homepage     = "https://github.com/veader/V8HorizontalPickerView"
